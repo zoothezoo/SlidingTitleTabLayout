@@ -26,11 +26,11 @@ internal class MainActivity : AppCompatActivity() {
             listOf(
                 ImageData(
                     title = "imageA",
-                    color = R.color.teal_700
+                    color = R.color.yellow
                 ),
                 ImageData(
                     title = "imageB",
-                    color = R.color.teal_200
+                    color = R.color.purple
                 )
             )
         )

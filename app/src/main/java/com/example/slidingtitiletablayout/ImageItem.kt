@@ -7,15 +7,15 @@ import com.xwray.groupie.databinding.BindableItem
 
 internal class ImageItem(
     private val data: ImageData
-) : BindableItem<ImageItemBinding>() {
-    @SuppressLint("ResourceAsColor")
+) : BindableItem<ImageItemBinding>(data.title.hashCode().toLong()) {
+    @SuppressLint("UseCompatLoadingForDrawables")
     override fun bind(
         binding: ImageItemBinding,
         position: Int
     ) {
         with(binding) {
             textTitle.text = data.title
-            textTitle.setBackgroundColor(data.color)
+            constraintLayout.background = root.context.getDrawable(data.color)
         }
     }
 
