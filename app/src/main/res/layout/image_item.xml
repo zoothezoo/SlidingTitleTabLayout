@@ -10,23 +10,12 @@
         <TextView
             android:id="@+id/text_title"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="48dp"
+            android:layout_height="match_parent"
+            android:layout_marginVertical="200dp"
             android:textSize="24sp"
-            app:layout_constraintBottom_toTopOf="@id/image_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_chainStyle="spread" />
-
-        <ImageView
-            android:id="@+id/image_content"
-            android:layout_width="320dp"
-            android:layout_height="wrap_content"
-            android:contentDescription="@null"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/text_title" />
+            app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
