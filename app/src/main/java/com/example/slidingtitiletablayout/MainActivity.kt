@@ -6,12 +6,17 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.ColorUtils
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.viewpager2.widget.ViewPager2
 import com.example.slidingtitiletablayout.databinding.ActivityMainBinding
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 
 internal class MainActivity : AppCompatActivity() {
+
+    private val tabViews = mutableListOf<TabMultipleTextView>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -20,12 +25,22 @@ internal class MainActivity : AppCompatActivity() {
 
         val imageAdapter = ImageAdapter()
 
+        initTabLayout(
+            tabLayout = binding.tabLayout,
+            viewPager = binding.viewPager,
+        ) { tab, position ->
+            val customView = TabMultipleTextView(this)
+            val (title, info) = when (position) {
+                0 -> "おはようございます" to "今日も1日"
+                1 -> "おやすみなさい" to "明日も1日"
+                else -> "おやすみなさい" to "明日も1日"
+            }
+            customView.setText(info, title)
+            tab.customView = customView
+        }
+
         with(binding) {
             viewPager.adapter = imageAdapter
-            TabLayoutMediator(tabLayout, viewPager) { tab, position ->
-                tab.text = getTabTextList()[position]
-            }.attach()
-
             tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
                 @SuppressLint("UseCompatLoadingForDrawables")
                 override fun onTabSelected(tab: TabLayout.Tab) {
@@ -82,6 +97,30 @@ internal class MainActivity : AppCompatActivity() {
                     color = R.color.purple
                 )
             )
+        )
+    }
+
+    private fun initTabLayout(
+        tabLayout: TabLayout,
+        viewPager: ViewPager2,
+        tabConfigurationStrategy: TabLayoutMediator.TabConfigurationStrategy
+    ) {
+        val tabLayoutMediator = TabLayoutMediator(
+            tabLayout,
+            viewPager,
+            tabConfigurationStrategy
+        )
+        ViewTreeLifecycleOwner.get(viewPager)?.lifecycle?.addObserver(
+            object : DefaultLifecycleObserver {
+                override fun onCreate(owner: LifecycleOwner) {
+                    tabLayoutMediator.attach()
+                }
+
+                override fun onDestroy(owner: LifecycleOwner) {
+                    tabLayoutMediator.detach()
+                    ViewTreeLifecycleOwner.get(viewPager)?.lifecycle?.removeObserver(this)
+                }
+            }
         )
     }
 }
