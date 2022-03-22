@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.graphics.ColorUtils
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
@@ -17,6 +16,7 @@ import com.google.android.material.tabs.TabLayoutMediator
 internal class MainActivity : AppCompatActivity() {
 
     private val tabViews = mutableListOf<TabMultipleTextView>()
+    private lateinit var customView: TabMultipleTextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,7 +29,7 @@ internal class MainActivity : AppCompatActivity() {
             tabLayout = binding.tabLayout,
             viewPager = binding.viewPager,
         ) { tab, position ->
-            val customView = TabMultipleTextView(this)
+            customView = TabMultipleTextView(this)
             val (title, info) = when (position) {
                 0 -> "おはようございます" to "今日も1日"
                 1 -> "おやすみなさい" to "明日も1日"
@@ -37,6 +37,7 @@ internal class MainActivity : AppCompatActivity() {
             }
             customView.setText(info, title)
             tab.customView = customView
+            tabViews.add(customView)
         }
 
         with(binding) {
@@ -67,21 +68,19 @@ internal class MainActivity : AppCompatActivity() {
                     positionOffsetPixels: Int
                 ) {
                     super.onPageScrolled(position, positionOffset, positionOffsetPixels)
-                    val color = when {
-                        positionOffset != 0f -> {
-                            ColorUtils.blendARGB(
-                                getColor(R.color.yellow),
-                                getColor(R.color.purple),
-                                positionOffset
-                            )
-                        }
-                        position == 0 -> getColor(R.color.yellow)
-                        position == 1 -> getColor(R.color.purple)
-                        else -> getColor(R.color.yellow)
+                    tabViews.forEachIndexed { index, tabView ->
+                        tabView.setTextColor(
+                            tabPosition = index,
+                            currentPosition = position,
+                            positionOffset = positionOffset
+                        )
                     }
-                    // ここで色の指定しない方がいい？
-                    tabLayout.setSelectedTabIndicatorColor(color)
+                    // tabLayout.setSelectedTabIndicatorColor(color)
                     Log.d("onPageScrolled", "position: $position, offset: $positionOffset")
+                }
+
+                override fun onPageScrollStateChanged(state: Int) {
+                    super.onPageScrollStateChanged(state)
                 }
             })
         }
