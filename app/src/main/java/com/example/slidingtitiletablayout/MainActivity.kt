@@ -1,10 +1,15 @@
 package com.example.slidingtitiletablayout
 
 import android.annotation.SuppressLint
+import android.content.res.ColorStateList
+import android.graphics.*
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.ColorUtils
+import androidx.core.graphics.drawable.DrawableCompat
+import androidx.core.graphics.drawable.TintAwareDrawable
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
@@ -26,6 +31,7 @@ internal class MainActivity : AppCompatActivity() {
             DataBindingUtil.setContentView(this, R.layout.activity_main)
 
         val imageAdapter = ImageAdapter()
+        val tabDrawable = getDrawable(R.drawable.tab_layout_round_shape) ?: return
 
         initTabLayout(
             tabLayout = binding.tabLayout,
@@ -44,8 +50,7 @@ internal class MainActivity : AppCompatActivity() {
 
         with(binding) {
             viewPager.adapter = imageAdapter
-            val indicator = getDrawable(R.drawable.tab_layout_round_shape)
-            tabLayout.setSelectedTabIndicator(indicator)
+            tabLayout.setSelectedTabIndicator(TintDisabledDrawableWrapper(tabDrawable))
             viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
                 override fun onPageScrolled(
                     position: Int,
@@ -72,6 +77,8 @@ internal class MainActivity : AppCompatActivity() {
                         position == 1 -> getColor(R.color.purple)
                         else -> getColor(R.color.yellow)
                     }
+                    val wrappedDrawable = DrawableCompat.wrap(tabDrawable)
+                    DrawableCompat.setTint(wrappedDrawable, color)
                     Log.d("onPageScrolled", "position: $position, offset: $positionOffset")
                 }
             })
@@ -118,3 +125,73 @@ internal class MainActivity : AppCompatActivity() {
 
 private fun getTabTextList() =
     listOf("おはようございます", "おやすみなさい")
+
+@SuppressLint("RestrictedApi")
+class TintDisabledDrawableWrapper(
+    private val wrappedDrawable: Drawable
+) : Drawable(), TintAwareDrawable {
+    override fun getDirtyBounds(): Rect = wrappedDrawable.dirtyBounds
+    override fun jumpToCurrentState() = wrappedDrawable.jumpToCurrentState()
+    override fun draw(canvas: Canvas) = wrappedDrawable.draw(canvas)
+    override fun getChangingConfigurations(): Int = wrappedDrawable.changingConfigurations
+    override fun isStateful(): Boolean = wrappedDrawable.isStateful
+    override fun setState(stateSet: IntArray): Boolean = wrappedDrawable.setState(stateSet)
+    override fun getState(): IntArray = wrappedDrawable.state
+    override fun getCurrent(): Drawable = wrappedDrawable.current
+    override fun getOpacity(): Int = wrappedDrawable.opacity
+    override fun getTransparentRegion(): Region? = wrappedDrawable.transparentRegion
+    override fun getIntrinsicWidth(): Int = wrappedDrawable.intrinsicWidth
+    override fun getIntrinsicHeight(): Int = wrappedDrawable.intrinsicHeight
+    override fun getMinimumWidth(): Int = wrappedDrawable.minimumWidth
+    override fun getMinimumHeight(): Int = wrappedDrawable.minimumHeight
+    override fun getPadding(padding: Rect): Boolean = wrappedDrawable.getPadding(padding)
+    override fun isAutoMirrored(): Boolean = wrappedDrawable.isAutoMirrored
+    override fun getConstantState(): ConstantState? = null
+    override fun mutate(): Drawable = wrappedDrawable.mutate()
+    override fun onLevelChange(level: Int): Boolean = wrappedDrawable.setLevel(level)
+    override fun setTint(tint: Int) = Unit
+    override fun setTintList(tint: ColorStateList?) = Unit
+    override fun setTintMode(tintMode: PorterDuff.Mode?) = Unit
+    override fun setHotspot(x: Float, y: Float) {
+        wrappedDrawable.setHotspot(x, y)
+    }
+
+    override fun setHotspotBounds(left: Int, top: Int, right: Int, bottom: Int) {
+        wrappedDrawable.setHotspotBounds(left, top, right, bottom)
+    }
+
+    override fun getOutline(outline: Outline) {
+        wrappedDrawable.getOutline(outline)
+    }
+
+    override fun onBoundsChange(bounds: Rect) {
+        wrappedDrawable.bounds = bounds
+    }
+
+    override fun setChangingConfigurations(configs: Int) {
+        wrappedDrawable.changingConfigurations = configs
+    }
+
+    override fun setDither(dither: Boolean) {
+        wrappedDrawable.setDither(dither)
+    }
+
+    override fun setFilterBitmap(filter: Boolean) {
+        wrappedDrawable.isFilterBitmap = filter
+    }
+
+    override fun setAlpha(alpha: Int) {
+        wrappedDrawable.alpha = alpha
+    }
+
+    override fun setColorFilter(cf: ColorFilter?) {
+        wrappedDrawable.colorFilter = cf
+    }
+
+    override fun setAutoMirrored(mirrored: Boolean) {
+        wrappedDrawable.isAutoMirrored = mirrored
+    }
+
+    override fun setVisible(visible: Boolean, restart: Boolean): Boolean =
+        wrappedDrawable.setVisible(visible, restart)
+}
