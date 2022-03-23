@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.graphics.ColorUtils
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
@@ -18,6 +19,7 @@ internal class MainActivity : AppCompatActivity() {
     private val tabViews = mutableListOf<TabMultipleTextView>()
     private lateinit var customView: TabMultipleTextView
 
+    @SuppressLint("UseCompatLoadingForDrawables")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val binding: ActivityMainBinding =
@@ -42,25 +44,8 @@ internal class MainActivity : AppCompatActivity() {
 
         with(binding) {
             viewPager.adapter = imageAdapter
-            tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
-                @SuppressLint("UseCompatLoadingForDrawables")
-                override fun onTabSelected(tab: TabLayout.Tab) {
-                    viewPager.currentItem = tab.position
-                    val indicator = if (tab.position == 0) {
-                        getDrawable(R.drawable.tab_layout_round_shape_yellow)
-                    } else {
-                        getDrawable(R.drawable.tab_layout_round_shape_purple)
-                    }
-                    tabLayout.setSelectedTabIndicator(indicator)
-                }
-
-                override fun onTabUnselected(tab: TabLayout.Tab?) {
-                }
-
-                override fun onTabReselected(tab: TabLayout.Tab?) {
-                }
-            })
-
+            val indicator = getDrawable(R.drawable.tab_layout_round_shape)
+            tabLayout.setSelectedTabIndicator(indicator)
             viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
                 override fun onPageScrolled(
                     position: Int,
@@ -75,12 +60,19 @@ internal class MainActivity : AppCompatActivity() {
                             positionOffset = positionOffset
                         )
                     }
-                    // tabLayout.setSelectedTabIndicatorColor(color)
+                    val color = when {
+                        positionOffset != 0f -> {
+                            ColorUtils.blendARGB(
+                                getColor(R.color.yellow),
+                                getColor(R.color.purple),
+                                positionOffset
+                            )
+                        }
+                        position == 0 -> getColor(R.color.yellow)
+                        position == 1 -> getColor(R.color.purple)
+                        else -> getColor(R.color.yellow)
+                    }
                     Log.d("onPageScrolled", "position: $position, offset: $positionOffset")
-                }
-
-                override fun onPageScrollStateChanged(state: Int) {
-                    super.onPageScrollStateChanged(state)
                 }
             })
         }
