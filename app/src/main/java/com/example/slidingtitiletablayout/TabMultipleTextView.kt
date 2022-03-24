@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.annotation.AttrRes
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.graphics.ColorUtils
 
 class TabMultipleTextView(
     context: Context,
@@ -35,34 +34,13 @@ class TabMultipleTextView(
     fun setTextColor(
         tabPosition: Int,
         currentPosition: Int,
-        positionOffset: Float
     ) {
         val color =
             if (tabPosition == 0) {
-                when {
-                    positionOffset != 0f -> {
-                        ColorUtils.blendARGB(
-                            context.getColor(R.color.white),
-                            context.getColor(R.color.yellow),
-                            positionOffset
-                        )
-                    }
-                    currentPosition == 1 -> context.getColor(R.color.yellow)
-                    else -> context.getColor(R.color.white)
-                }
+                if (currentPosition == 1) context.getColor(R.color.yellow) else context.getColor(R.color.white)
             } else {
-                when {
-                    positionOffset != 0f -> {
-                        ColorUtils.blendARGB(
-                            context.getColor(R.color.purple),
-                            context.getColor(R.color.white),
-                            positionOffset
-                        )
-                    }
-                    currentPosition == 0 -> context.getColor(R.color.purple)
-                    else -> context.getColor(R.color.white)
+                if (currentPosition == 0) context.getColor(R.color.purple) else context.getColor(R.color.white)
                 }
-            }
         this.info.setTextColor(color)
         this.title.setTextColor(color)
     }

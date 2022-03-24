@@ -8,7 +8,6 @@ import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.drawable.TintAwareDrawable
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.DefaultLifecycleObserver
@@ -55,7 +54,6 @@ internal class MainActivity : AppCompatActivity() {
 
         with(binding) {
             viewPager.adapter = imageAdapter
-            //tabLayout.setSelectedTabIndicator(TintDisabledDrawableWrapper(tabDrawable))
             tabLayout.setSelectedTabIndicator(TintDisabledDrawableWrapper(gradientDrawable))
             viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
                 override fun onPageScrolled(
@@ -64,6 +62,7 @@ internal class MainActivity : AppCompatActivity() {
                     positionOffsetPixels: Int
                 ) {
                     super.onPageScrolled(position, positionOffset, positionOffsetPixels)
+/*
                     tabViews.forEachIndexed { index, tabView ->
                         tabView.setTextColor(
                             tabPosition = index,
@@ -71,26 +70,30 @@ internal class MainActivity : AppCompatActivity() {
                             positionOffset = positionOffset
                         )
                     }
-                    val (light, dark) = when {
-                        positionOffset != 0f -> {
-                            val light = ColorUtils.blendARGB(
-                                getColor(R.color.yellow_light),
-                                getColor(R.color.purple_light),
-                                positionOffset
-                            )
-                            val dark = ColorUtils.blendARGB(
-                                getColor(R.color.yellow_dark),
-                                getColor(R.color.purple_dark),
-                                positionOffset
-                            )
-                            light to dark
-                        }
-                        position == 0 -> getColor(R.color.yellow_light) to getColor(R.color.yellow_dark)
-                        position == 1 -> getColor(R.color.purple_light) to getColor(R.color.purple_dark)
+                    val (light, dark) = when (position) {
+                        0 -> getColor(R.color.yellow_light) to getColor(R.color.yellow_dark)
+                        1 -> getColor(R.color.purple_light) to getColor(R.color.purple_dark)
                         else -> getColor(R.color.yellow_light) to getColor(R.color.yellow_dark)
                     }
                     gradientDrawable.colors = listOf(light, dark).toIntArray()
                     Log.d("onPageScrolled", "position: $position, offset: $positionOffset")
+*/
+                }
+
+                override fun onPageSelected(position: Int) {
+                    super.onPageSelected(position)
+                    tabViews.forEachIndexed { index, tabView ->
+                        tabView.setTextColor(
+                            tabPosition = index,
+                            currentPosition = position,
+                        )
+                    }
+                    val (light, dark) = when (position) {
+                        0 -> getColor(R.color.yellow_light) to getColor(R.color.yellow_dark)
+                        1 -> getColor(R.color.purple_light) to getColor(R.color.purple_dark)
+                        else -> getColor(R.color.yellow_light) to getColor(R.color.yellow_dark)
+                    }
+                    gradientDrawable.colors = listOf(light, dark).toIntArray()
                 }
             })
         }
