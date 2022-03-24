@@ -71,20 +71,6 @@ internal class MainActivity : AppCompatActivity() {
                             positionOffset = positionOffset
                         )
                     }
-/*
-                    val color = when {
-                        positionOffset != 0f -> {
-                            ColorUtils.blendARGB(
-                                getColor(R.color.yellow),
-                                getColor(R.color.purple),
-                                positionOffset
-                            )
-                        }
-                        position == 0 -> getColor(R.color.yellow)
-                        position == 1 -> getColor(R.color.purple)
-                        else -> getColor(R.color.yellow)
-                    }
-*/
                     val (light, dark) = when {
                         positionOffset != 0f -> {
                             val light = ColorUtils.blendARGB(
@@ -103,11 +89,7 @@ internal class MainActivity : AppCompatActivity() {
                         position == 1 -> getColor(R.color.purple_light) to getColor(R.color.purple_dark)
                         else -> getColor(R.color.yellow_light) to getColor(R.color.yellow_dark)
                     }
-                    // val wrappedDrawable = DrawableCompat.wrap(gradientDrawable)
-                    // DrawableCompat.setTint(wrappedDrawable)
                     gradientDrawable.colors = listOf(light, dark).toIntArray()
-                    // val wrappedDrawable = DrawableCompat.wrap(tabDrawable)
-                    // DrawableCompat.setTint(wrappedDrawable, color)
                     Log.d("onPageScrolled", "position: $position, offset: $positionOffset")
                 }
             })
