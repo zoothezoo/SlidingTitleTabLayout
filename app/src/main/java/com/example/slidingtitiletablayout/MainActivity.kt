@@ -4,11 +4,11 @@ import android.annotation.SuppressLint
 import android.content.res.ColorStateList
 import android.graphics.*
 import android.graphics.drawable.Drawable
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.ColorUtils
-import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.graphics.drawable.TintAwareDrawable
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.DefaultLifecycleObserver
@@ -31,7 +31,12 @@ internal class MainActivity : AppCompatActivity() {
             DataBindingUtil.setContentView(this, R.layout.activity_main)
 
         val imageAdapter = ImageAdapter()
-        val tabDrawable = getDrawable(R.drawable.tab_layout_round_shape) ?: return
+        val gradientDrawable = GradientDrawable(
+            GradientDrawable.Orientation.TL_BR,
+            intArrayOf(getColor(R.color.yellow_light), getColor(R.color.yellow_dark))
+        ).apply {
+            cornerRadius = 16f
+        }
 
         initTabLayout(
             tabLayout = binding.tabLayout,
@@ -50,7 +55,8 @@ internal class MainActivity : AppCompatActivity() {
 
         with(binding) {
             viewPager.adapter = imageAdapter
-            tabLayout.setSelectedTabIndicator(TintDisabledDrawableWrapper(tabDrawable))
+            //tabLayout.setSelectedTabIndicator(TintDisabledDrawableWrapper(tabDrawable))
+            tabLayout.setSelectedTabIndicator(TintDisabledDrawableWrapper(gradientDrawable))
             viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
                 override fun onPageScrolled(
                     position: Int,
@@ -65,6 +71,7 @@ internal class MainActivity : AppCompatActivity() {
                             positionOffset = positionOffset
                         )
                     }
+/*
                     val color = when {
                         positionOffset != 0f -> {
                             ColorUtils.blendARGB(
@@ -77,8 +84,30 @@ internal class MainActivity : AppCompatActivity() {
                         position == 1 -> getColor(R.color.purple)
                         else -> getColor(R.color.yellow)
                     }
-                    val wrappedDrawable = DrawableCompat.wrap(tabDrawable)
-                    DrawableCompat.setTint(wrappedDrawable, color)
+*/
+                    val (light, dark) = when {
+                        positionOffset != 0f -> {
+                            val light = ColorUtils.blendARGB(
+                                getColor(R.color.yellow_light),
+                                getColor(R.color.purple_light),
+                                positionOffset
+                            )
+                            val dark = ColorUtils.blendARGB(
+                                getColor(R.color.yellow_dark),
+                                getColor(R.color.purple_dark),
+                                positionOffset
+                            )
+                            light to dark
+                        }
+                        position == 0 -> getColor(R.color.yellow_light) to getColor(R.color.yellow_dark)
+                        position == 1 -> getColor(R.color.purple_light) to getColor(R.color.purple_dark)
+                        else -> getColor(R.color.yellow_light) to getColor(R.color.yellow_dark)
+                    }
+                    // val wrappedDrawable = DrawableCompat.wrap(gradientDrawable)
+                    // DrawableCompat.setTint(wrappedDrawable)
+                    gradientDrawable.colors = listOf(light, dark).toIntArray()
+                    // val wrappedDrawable = DrawableCompat.wrap(tabDrawable)
+                    // DrawableCompat.setTint(wrappedDrawable, color)
                     Log.d("onPageScrolled", "position: $position, offset: $positionOffset")
                 }
             })
