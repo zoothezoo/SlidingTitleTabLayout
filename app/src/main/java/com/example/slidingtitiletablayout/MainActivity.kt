@@ -6,7 +6,6 @@ import android.graphics.*
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.drawable.TintAwareDrawable
@@ -55,7 +54,6 @@ internal class MainActivity : AppCompatActivity() {
 
         with(binding) {
             viewPager.adapter = imageAdapter
-            //tabLayout.setSelectedTabIndicator(TintDisabledDrawableWrapper(tabDrawable))
             tabLayout.setSelectedTabIndicator(TintDisabledDrawableWrapper(gradientDrawable))
             viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
                 override fun onPageScrolled(
@@ -71,26 +69,50 @@ internal class MainActivity : AppCompatActivity() {
                             positionOffset = positionOffset
                         )
                     }
-                    val (light, dark) = when {
-                        positionOffset != 0f -> {
-                            val light = ColorUtils.blendARGB(
-                                getColor(R.color.yellow_light),
-                                getColor(R.color.purple_light),
-                                positionOffset
-                            )
-                            val dark = ColorUtils.blendARGB(
-                                getColor(R.color.yellow_dark),
-                                getColor(R.color.purple_dark),
-                                positionOffset
-                            )
-                            light to dark
+                    val currentPosition = viewPager.currentItem
+                    val (light, dark) = if (currentPosition == 0) {
+                        when {
+                            0.5 < positionOffset && positionOffset < 1.0f -> {
+                                val gradientPercent = (positionOffset - 0.5f) * 2f
+                                val light = ColorUtils.blendARGB(
+                                    getColor(R.color.yellow_light),
+                                    getColor(R.color.purple_light),
+                                    gradientPercent
+                                )
+                                val dark = ColorUtils.blendARGB(
+                                    getColor(R.color.yellow_dark),
+                                    getColor(R.color.purple_dark),
+                                    gradientPercent
+                                )
+                                light to dark
+                            }
+                            currentPosition == 0 -> getColor(R.color.yellow_light) to getColor(R.color.yellow_dark)
+                            currentPosition == 1 -> getColor(R.color.purple_light) to getColor(R.color.purple_dark)
+                            else -> getColor(R.color.yellow_light) to getColor(R.color.yellow_dark)
                         }
-                        position == 0 -> getColor(R.color.yellow_light) to getColor(R.color.yellow_dark)
-                        position == 1 -> getColor(R.color.purple_light) to getColor(R.color.purple_dark)
-                        else -> getColor(R.color.yellow_light) to getColor(R.color.yellow_dark)
+                    } else {
+                        when {
+                            0.0f < positionOffset && positionOffset < 0.5f -> {
+                                val gradientPercent = (0.5f - positionOffset) * 2f
+                                val light = ColorUtils.blendARGB(
+                                    getColor(R.color.purple_light),
+                                    getColor(R.color.yellow_light),
+                                    gradientPercent
+                                )
+                                val dark = ColorUtils.blendARGB(
+                                    getColor(R.color.purple_dark),
+                                    getColor(R.color.yellow_dark),
+                                    gradientPercent
+                                )
+                                light to dark
+                            }
+                            currentPosition == 0 -> getColor(R.color.yellow_light) to getColor(R.color.yellow_dark)
+                            currentPosition == 1 -> getColor(R.color.purple_light) to getColor(R.color.purple_dark)
+                            else -> getColor(R.color.yellow_light) to getColor(R.color.yellow_dark)
+                        }
                     }
-                    gradientDrawable.colors = listOf(light, dark).toIntArray()
-                    Log.d("onPageScrolled", "position: $position, offset: $positionOffset")
+                    gradientDrawable.colors = listOf(light, dark)
+                        .toIntArray()
                 }
             })
         }
