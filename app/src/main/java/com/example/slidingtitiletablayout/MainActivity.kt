@@ -70,10 +70,11 @@ internal class MainActivity : AppCompatActivity() {
                         )
                     }
                     val currentPosition = viewPager.currentItem
+                    val percent = 0.3f
                     val (light, dark) = if (currentPosition == 0) {
                         when {
-                            0.5 < positionOffset && positionOffset < 1.0f -> {
-                                val gradientPercent = (positionOffset - 0.5f) * 2f
+                            1f - percent < positionOffset && positionOffset < 1f -> {
+                                val gradientPercent = (positionOffset - (1f - percent)) / percent
                                 val light = ColorUtils.blendARGB(
                                     getColor(R.color.yellow_light),
                                     getColor(R.color.purple_light),
@@ -92,8 +93,8 @@ internal class MainActivity : AppCompatActivity() {
                         }
                     } else {
                         when {
-                            0.0f < positionOffset && positionOffset < 0.5f -> {
-                                val gradientPercent = (0.5f - positionOffset) * 2f
+                            0f < positionOffset && positionOffset < percent -> {
+                                val gradientPercent = ((percent) - positionOffset) / percent
                                 val light = ColorUtils.blendARGB(
                                     getColor(R.color.purple_light),
                                     getColor(R.color.yellow_light),
